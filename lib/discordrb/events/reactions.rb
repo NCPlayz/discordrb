@@ -110,4 +110,37 @@ module Discordrb::Events
       [].reduce(true, &:&)
     end
   end
+
+  # Event raised when somebody removes a specific emoji reaction from a message.
+  class ReactionRemoveEmojiEvent < Event
+    include Respondable
+
+    # @return [Emoji] the emoji that was removed.
+    attr_reader :emoji
+
+    def initialize(data, bot)
+      @bot = bot
+
+      @emoji = Discordrb::Emoji.new(data['emoji'], bot, nil)
+      @message_id = data['message_id'].to_i
+      @channel_id = data['channel_id'].to_i
+    end
+
+    # @return [Message] the message that the reactions were removed from.
+    def message
+      @message ||= channel.load_message(@message_id)
+    end
+
+    # @return [Channel] the channel that the reactions were removed in.
+    def channel
+      @channel ||= @bot.channel(@channel_id)
+    end
+
+    # @return [Server, nil] the server that the reactions were removed in. If reacted in a PM channel, it will be nil.
+    def server
+      @server ||= channel.server
+    end
+
+    # Event handler for {ReactionRemoveEmojiEvent}
+    class ReactionRemoveEmojiEventHandler < ReactionEventHandler; end
 end

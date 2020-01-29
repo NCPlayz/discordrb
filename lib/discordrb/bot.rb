@@ -989,6 +989,8 @@ module Discordrb
     # Internal handler for MESSAGE_REACTION_REMOVE_ALL
     def remove_all_message_reactions(data); end
 
+    def remove_emoji_reaction(data); end
+
     # Internal handler for GUILD_BAN_ADD
     def add_user_ban(data); end
 
@@ -1170,6 +1172,11 @@ module Discordrb
         remove_all_message_reactions(data)
 
         event = ReactionRemoveAllEvent.new(data, self)
+        raise_event(event)
+      when :MESSAGE_REACTION_REMOVE_EMOJI
+        remove_emoji_reaction(data)
+        
+        event = ReactionRemoveEmojiEvent.new(data, self)
         raise_event(event)
       when :PRESENCE_UPDATE
         # Ignore friends list presences
